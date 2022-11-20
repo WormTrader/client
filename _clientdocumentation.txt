@@ -1,0 +1,139 @@
+ 
+
+
+Response to your Trouble ticket #774835 created on 2008/03/24 12:33 EST.  
+Subject: API 
+Initial Description: 
+Response from rayros at 2008/03/31 09:42 EST:
+1.) 
+There has always been a limitation of 60 requests for historical backfill every 10 minutes for TWS charts and any connected third party applications. In the past our systems were lenient when handling this limitation allowing additional backfill requests to be placed in a queue and processed at a later time. This functionality of our systems has been changed to reject any backfill requests that exceed the 60 requests/ 10 minute limitation. 
+Also please include 10 second spacing before calling the same request.
+2. Here is the valid information for DURATION and BAR SIZE SETTING combination:
+DURATION BAR SIZE
+1 Y 1 day
+6 M 1 day
+3 M 1 day
+1 M 1 day, 1 hour
+1 W 1 day, 1 hour, 30 mins, 15 mins
+2 D 1 hour, 30 mins, 15 mins, 3 mins, 2 mins, 1 min
+1 D 1 hour, 30 mins, 15 mins, 3 mins, 2 mins, 1 min, 30 secs
+14400 S (4 hrs) 1 hour, 30 mins, 15 mins, 3 mins, 2 mins, 1 min, 30 secs, 15 secs
+7200 S (2 hrs) 1 hour, 30 mins, 15 mins, 3 mins, 2 mins, 1 min, 30 secs, 15 secs, 5 secs
+3600 S (1 hr) 15 mins, 5 mins 3 mins, 2 mins, 1 min, 30 secs, 15 secs, 5 secs, 1 secs
+1800 S (30 mins) 15 mins, 5 mins 3 mins, 2 mins, 1 min, 30 secs, 15 secs, 5 secs, 1 secs
+960 S (15 mins.) 5 mins 3 mins, 2 mins, 1 min, 30 secs, 15 secs 5 secs 1 secs
+300 S (5 mins) 3 mins, 2 mins, 1 min, 30 secs, 15 secs, 5 secs, 1 secs
+60 S ( 1 min) 30 secs, 15 secs, 5 secs, 1 secs
+3. It has been escalated already and it should be fixed on 9.50 version of API.
+Raymund 
+IB Technical Support 
+
+package com.ib.client;
+
+
+public interface AnyWrapper
+	{
+	void error( Exception e );
+	void error( String str );
+	void error( int id, int errorCode, String errorMsg );
+	void connectionClosed();
+	}
+
+public interface EWrapper extends AnyWrapper
+	{
+
+public interface MarketDataListener
+	{
+	void tickPrice (	int tickerId, int field, double price, int canAutoExecute);
+	void tickSize(		int tickerId, int field, int size);
+	void tickOptionComputation( int tickerId, int field, double impliedVol,
+    		double delta, double modelPrice, double pvDividend);
+	void tickGeneric(int tickerId, int tickType, double value);
+	void tickString(int tickerId, int tickType, String value);
+	void tickEFP(int tickerId, int tickType, double basisPoints,
+			String formattedBasisPoints, double impliedFuture, int holdDays,
+			String futureExpiry, double dividendImpact, double dividendsToExpiry);
+	}
+
+public interface OrderDataListener
+	{
+	void orderStatus( int orderId, String status, int filled, int remaining,
+            double avgFillPrice, int permId, int parentId, double lastFillPrice,
+            int clientId, String whyHeld);
+	void openOrder( int orderId, Contract contract, Order order);
+	void nextValidId( int orderId);
+	void execDetails( int orderId, Contract contract, Execution execution);
+	}
+
+public interface AccountDataListener
+	{
+	void updateAccountValue (	String key, String value,
+												String currency, String accountName);
+	void updatePortfolio (	Contract contract, int position,
+											double marketPrice, double marketValue,
+											double averageCost, double unrealizedPNL,
+											double realizedPNL, String accountName);
+	void updateAccountTime ( String timeStamp);
+	}
+
+public interface ContractDetailsListener
+	{
+	void contractDetails(ContractDetails contractDetails);
+	void bondContractDetails(ContractDetails contractDetails);
+	}
+
+public interface MarketDepthListener
+	{
+	void updateMktDepth (		int tickerId, int position,
+											int operation, int side,
+											double price, int size );
+	void updateMktDepthL2 (	int tickerId, int position,
+											String marketMaker, int operation,
+											int side, double price, int size );
+	}
+
+public interface NewsBulletinListener
+	{
+	void updateNewsBulletin (	int msgId, int msgType, 
+												String message, String origExchange );
+	}
+
+public interface ManagedAccountsListener
+	{
+	void managedAccounts( String accountsList);
+	void receiveFA(int faDataType, String xml);
+	}
+
+public interface HistoricalDataListener
+	{
+	void historicalData (		int reqId, String date,
+											double open, double high,
+											double low, double close,
+											int volume, int count,
+											double WAP,							// Weighted Average Price
+											boolean hasGaps );
+	}
+
+public interface ScannerDataListener
+	{
+	void scannerParameters ( String xml );
+	void scannerData ( int reqId, int rank,
+											ContractDetails contractDetails,
+											String distance, String benchmark,
+											String projection, String legsStr );
+	}
+
+public interface RealtimeBarsListener
+	{
+	void realtimeBar (			int reqId, long time,
+											double open, double high,
+											double low, double close,
+											long volume, double wap,
+											int count );
+	}
+
+public interface ServerTimeListener
+	{
+	void currentTime(long time);
+	}
+}
